@@ -1,0 +1,25 @@
+Welcome to TextBuddy. SampleFile.txt is ready for use
+Enter command: added to SampleFile.txt: "everything is awesome"
+Enter command: 1. everything is awesome
+Enter command: added to SampleFile.txt: "this is a line"
+Enter command: 1. everything is awesome
+2. this is a line
+Enter command: added to SampleFile.txt: "this is another line"
+Enter command: 1. everything is awesome
+2. this is a line
+3. this is another line
+Enter command: deleted from SampleFile.txt: "this is a line"
+Enter command: 1. everything is awesome
+2. this is another line
+Enter command: Please enter a valid ID
+Enter command: 1. everything is awesome
+2. this is another line
+Enter command: Please enter a valid ID
+Enter command: 1. everything is awesome
+2. this is another line
+Enter command: Invalid Command: THISISAWESOME
+Enter command: Invalid Command: 9
+Enter command: Please enter a valid ID
+Enter command: all content deleted from SampleFile.txt
+Enter command: SampleFile.txt is empty
+Enter command:

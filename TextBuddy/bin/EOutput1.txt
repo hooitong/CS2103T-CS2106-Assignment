@@ -1,0 +1,11 @@
+Welcome to TextBuddy. SampleFile.txt is ready for use
+Enter command: added to SampleFile.txt: "little brown fox"
+Enter command: 1. little brown fox
+Enter command: added to SampleFile.txt: "jumped over the moon"
+Enter command: 1. little brown fox
+2. jumped over the moon
+Enter command: deleted from SampleFile.txt: "jumped over the moon"
+Enter command: 1. little brown fox
+Enter command: all content deleted from SampleFile.txt
+Enter command: SampleFile.txt is empty
+Enter command:
