@@ -75,7 +75,7 @@ public class TextBuddy {
     private static final int INVALID_INTEGER = -1;
 
     /** This enum is used to store all possible commands in this application. */
-    private enum COMMAND_TYPE {
+    private enum CommandType {
         ADD_STRING, DISPLAY, DELETE, CLEAR, EXIT, INVALID
     };
 
@@ -110,7 +110,7 @@ public class TextBuddy {
             returnInvalidMessage(userInput);
         }
 
-        COMMAND_TYPE commandType = getCommandType(userInput);
+        CommandType commandType = getCommandType(userInput);
         String argument = removeFirstWord(userInput);
 
         switch (commandType) {
@@ -276,7 +276,10 @@ public class TextBuddy {
     }
 
     private static String deleteFromCache(int id) {
-        return fileCache.remove(--id);
+        // array id is one less than cache id
+        int arrayId = id - 1;
+
+        return fileCache.remove(arrayId);
     }
 
     /**
@@ -289,8 +292,11 @@ public class TextBuddy {
         StringBuilder sBuilder = new StringBuilder();
 
         for (int i = 1; i <= fileCache.size(); i++) {
+            // array id is one less than cache id
+            int arrayId = i - 1;
+
             sBuilder.append(String.format(MESSAGE_DISPLAY_ITEM, i,
-                    fileCache.get(i - 1)));
+                    fileCache.get(arrayId)));
             sBuilder.append(System.lineSeparator());
         }
 
@@ -360,21 +366,21 @@ public class TextBuddy {
      * @param userInput user's raw input
      * @return the command type based on user's input
      */
-    private static COMMAND_TYPE getCommandType(String userInput) {
+    private static CommandType getCommandType(String userInput) {
         String command = getFirstWord(userInput);
 
         if (command.equalsIgnoreCase("add")) {
-            return COMMAND_TYPE.ADD_STRING;
+            return CommandType.ADD_STRING;
         } else if (command.equalsIgnoreCase("delete")) {
-            return COMMAND_TYPE.DELETE;
+            return CommandType.DELETE;
         } else if (command.equalsIgnoreCase("clear")) {
-            return COMMAND_TYPE.CLEAR;
+            return CommandType.CLEAR;
         } else if (command.equalsIgnoreCase("display")) {
-            return COMMAND_TYPE.DISPLAY;
+            return CommandType.DISPLAY;
         } else if (command.equalsIgnoreCase("exit")) {
-            return COMMAND_TYPE.EXIT;
+            return CommandType.EXIT;
         } else {
-            return COMMAND_TYPE.INVALID;
+            return CommandType.INVALID;
         }
     }
 
