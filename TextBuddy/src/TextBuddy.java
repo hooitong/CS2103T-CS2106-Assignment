@@ -1,64 +1,60 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 
 /**
- * @author Yeap Hooi Tong
- * Metric Number: A0111736M
- *
- * This application allows the user to store information into the list
- * in a numbered format. The user is allowed to add, display, delete, clear
- * information in the list.
- *
- * Assumptions: The file can be saved to the disk after each user operation
- * to avoid loss of information due to unforeseen circumstances.
- *
- * We only accept the first argument provided in the command line interface
- * and ignore the rest that are provided.
- *
- * List of possible commands
- * -------------------------
- * - add [name]    (adds the string into the list)
- * - display       (display all strings in the list)
- * - delete [id]   (delete string from list based on id)
- * - clear         (remove all strings in list)
- * - exit          (exit application)
- *
- */
-
+* @author Yeap Hooi Tong
+*
+* This application allows the user to store information into the list
+* in a numbered format. The user is allowed to add, display, delete,
+* sort, search, clear information in the list.
+*
+* Assumptions: The file can be saved to the disk after each user operation
+* to avoid loss of information due to unforeseen circumstances.
+*
+* We only accept the first argument provided in the command line interface
+* and ignore the rest that are provided.
+*
+* List of possible commands
+* -------------------------
+* - add <name>    (adds the string into the list)
+* - display       (display all strings in the list)
+* - delete <id>   (delete string from list based on id)
+* - sort          (sort all strings in the list)
+* - search <word> (search and return all strings with word)
+* - clear         (remove all strings in list)
+* - exit          (exit application)
+*
+*/
 public class TextBuddy {
 
     /** These are system messages and can be formatted for uniformity. */
-    private static final String MESSAGE_WELCOME_STRING =
-            "Welcome to TextBuddy. %1$s is ready for use";
-    private static final String MESSAGE_INPUT_INVALID =
-            "Invalid Command: %1$s ";
-    private static final String MESSAGE_CLEAR_FILE =
-            "all content deleted from %1$s";
-    private static final String MESSAGE_ADD_SUCCESS =
-            "added to %1$s: \"%2$s\"";
-    private static final String MESSAGE_DELETE_SUCCESS =
-            "deleted from %1$s: \"%2$s\"";
-    private static final String MESSAGE_DELETE_INVALID_ID =
-            "Please enter a valid ID";
-    private static final String MESSAGE_DISPLAY_EMPTY =
-            "%1$s is empty";
-    private static final String MESSAGE_DISPLAY_ITEM =
-            "%1$s. %2$s";
-    private static final String FILEPATH_INVALID_STRING =
-            "You entered an invalid filename / filepath";
-    private static final String FILEPATH_MISSING_STRING =
-            "Please enter the path to the textfile to start.";
-    private static final String SYSTEM_UNKNOWN_COMMAND =
-            "System has encountered an unknown command type";
-    private static final String SYSTEM_IO_ERROR =
-            "It seems that we encountered an IO Exception";
+    private static final String MESSAGE_WELCOME_STRING = "welcome to TextBuddy. %1$s is ready for use";
+    private static final String MESSAGE_INPUT_INVALID = "invalid Command: %1$s";
+    private static final String MESSAGE_CLEAR_FILE = "all content deleted from %1$s";
+    private static final String MESSAGE_ADD_SUCCESS = "added to %1$s: \"%2$s\"";
+    private static final String MESSAGE_ADD_EMPTY = "you cannot add empty text";
+    private static final String MESSAGE_DELETE_SUCCESS = "deleted from %1$s: \"%2$s\"";
+    private static final String MESSAGE_DELETE_INVALID_ID = "please enter a valid ID";
+    private static final String MESSAGE_DISPLAY_EMPTY = "%1$s is empty";
+    private static final String MESSAGE_DISPLAY_ITEM = "%1$s. %2$s";
+    private static final String MESSAGE_SORT_SUCCESS = "all lines have been sorted";
+    private static final String MESSAGE_SORT_EMPTY = "nothing to sort";
+    private static final String MESSAGE_SEARCH_EMPTY = "please enter something to search";
+    private static final String MESSAGE_SEARCH_FAIL = "no line containing '%1$s' is found";
+    private static final String FILEPATH_INVALID_STRING = "you entered an invalid filename / filepath";
+    private static final String FILEPATH_MISSING_STRING = "please enter the path to the textfile to start";
+    private static final String SYSTEM_UNKNOWN_COMMAND = "system has encountered an unknown command type";
+    private static final String SYSTEM_IO_ERROR = "it seems that we encountered an IO Exception";
 
     /** These variables are used to maintain information of the text file. */
     private static String fileName;
@@ -76,7 +72,7 @@ public class TextBuddy {
 
     /** This enum is used to store all possible commands in this application. */
     private enum CommandType {
-        ADD_STRING, DISPLAY, DELETE, CLEAR, EXIT, INVALID
+        ADD_STRING, DISPLAY, DELETE, SORT, SEARCH, CLEAR, EXIT, INVALID
     };
 
     public static void main(String[] args) {
@@ -94,42 +90,56 @@ public class TextBuddy {
     }
 
     /**
-     * This method is used to handle the user command by prompting
-     * for input and check whether it is valid or not.
-     *
-     * If it is valid, the command will be executed accordingly
-     * else if will return an invalid message.
+     * This method is used to handle the user command by prompting for input and
+     * check whether is it empty. If not, proceed to call executeCommand.
      *
      * @return feedback after execution of command
      */
     private static String handleUserCommand() {
         String userInput = promptInput();
 
-        // return an error message if user entered an empty string
-        if (userInput.trim().equals("")) {
+        if (userInput.trim().isEmpty()) {
             returnInvalidMessage(userInput);
         }
 
+        return executeCommand(userInput);
+    }
+
+    /**
+     * This method is used to check whether the user command is valid or not. If
+     * it is valid, the command will be executed accordingly else if will return
+     * an invalid message.
+     *
+     * @param userInput raw input from user
+     * @return feedback after execution of command
+     */
+    protected static String executeCommand(String userInput) {
         CommandType commandType = getCommandType(userInput);
         String argument = removeFirstWord(userInput);
 
         switch (commandType) {
-            case ADD_STRING :
+            case ADD_STRING:
                 return addString(argument);
 
-            case DISPLAY :
+            case DISPLAY:
                 return display();
 
-            case DELETE :
+            case DELETE:
                 return delete(argument);
 
-            case CLEAR :
+            case SORT:
+                return sort();
+
+            case SEARCH:
+                return search(argument);
+
+            case CLEAR:
                 return clear();
 
-            case EXIT :
+            case EXIT:
                 System.exit(0);
 
-            case INVALID :
+            case INVALID:
                 return returnInvalidMessage(userInput);
 
             default:
@@ -138,14 +148,18 @@ public class TextBuddy {
     }
 
     /**
-     * This method is used to handle the user command
-     * 'add' which appends the given argument to the cache
-     * and perform a write operation to the file from cache.
+     * This method is used to handle the user command 'add' which appends the
+     * given argument to the cache and perform a write operation to the file
+     * from cache. Returns error message if no string is passed.
      *
      * @param argument the string that user would like to append
      * @return feedback on the add operation
      */
     private static String addString(String argument) {
+        if (argument.isEmpty()) {
+            return MESSAGE_ADD_EMPTY;
+        }
+
         addToCache(argument);
         writeToFile(true, argument);
 
@@ -153,16 +167,16 @@ public class TextBuddy {
     }
 
     /**
-     * This method is used to handle the user command
-     * 'display' where the program retrieves the string
-     * from cache and return the string or system message (if empty).
+     * This method is used to handle the user command 'display' where the
+     * program retrieves the string from cache and return the string or system
+     * message (if empty).
      *
      * @return feedback on the display operation
      */
     private static String display() {
         String cacheResult = readFromCache();
 
-        if (cacheResult.equals("")) {
+        if (cacheResult.isEmpty()) {
             return String.format(MESSAGE_DISPLAY_EMPTY, fileName);
         } else {
             return cacheResult;
@@ -170,13 +184,12 @@ public class TextBuddy {
     }
 
     /**
-     * This method is used to handle the user command
-     * 'delete' where the program checks whether it is
-     * a valid id and if so, removes the line from the
-     * cache based on the id. A write operation to the file
-     * is then performed from cache.
+     * This method is used to handle the user command 'delete' where the program
+     * checks whether it is a valid id and if so, removes the line from the
+     * cache based on the id. A write operation to the file is then performed
+     * from cache.
      *
-     * @param argument id / line number of the file
+     * @param argument id / line number of the string to delete
      * @return feedback on the delete operation
      */
     private static String delete(String argument) {
@@ -194,9 +207,46 @@ public class TextBuddy {
     }
 
     /**
-     * This method is used to handle the user command
-     * 'clear' where the program clears the cache and performs
-     * a write operation to the file from cache.
+     * This method is used to sort cache in alphabetical order and write to file.
+     * If cache is empty, return error message.
+     *
+     * @return feedback on sort operation
+     */
+    private static String sort() {
+        if (fileCache.isEmpty()) {
+            return MESSAGE_SORT_EMPTY;
+        }
+
+        Collections.sort(fileCache);
+        writeToFile(false, null);
+
+        return MESSAGE_SORT_SUCCESS;
+    }
+
+    /**
+     * This method is used to search and returns lines that contains the argument
+     * If no keyword is passed or no results found, return error message.
+     *
+     * @param argument the keyword to search for
+     * @return single String that contains all line containing keyword
+     */
+    private static String search(String argument) {
+        if (argument.isEmpty()) {
+            return MESSAGE_SEARCH_EMPTY;
+        }
+
+        String cacheResult = readFromCache(argument);
+
+        if (cacheResult.isEmpty()) {
+            return String.format(MESSAGE_SEARCH_FAIL, argument);
+        } else {
+            return cacheResult;
+        }
+    }
+
+    /**
+     * This method is used to handle the user command 'clear' where the program
+     * clears the cache and performs a write operation to the file from cache.
      *
      * @return feedback on the clear operation
      */
@@ -208,8 +258,8 @@ public class TextBuddy {
     }
 
     /**
-     * This method is used to load every line of String from
-     * the specified file into the cache via BufferedReader.
+     * This method is used to load every line of String from the specified file
+     * into the cache via BufferedReader.
      */
     private static void readFromFile() {
         BufferedReader bReader = null;
@@ -236,11 +286,10 @@ public class TextBuddy {
     }
 
     /**
-     * This method is used to write either from the cache to the file
-     * or appends a specified argument to the end of the file
-     * via BufferedWriter.
+     * This method is used to write either from the cache to the file or appends
+     * a specified argument to the end of the file via BufferedWriter.
      *
-     * @param isAppend determines a append or write operation to the file
+     * @param isAppend  determines a append or write operation to the file
      * @param newString if isAppend, this string will be appended to file
      */
     private static void writeToFile(boolean isAppend, String newString) {
@@ -252,7 +301,6 @@ public class TextBuddy {
             if (isAppend) {
                 bWriter.append(newString);
             } else {
-                // insert every line of string from cache to file
                 for (String line : fileCache) {
                     bWriter.append(line);
                     bWriter.newLine();
@@ -283,21 +331,33 @@ public class TextBuddy {
     }
 
     /**
-     * This method utilizes a StringBuilder to concatenate all the strings
-     * in the cache in the given display format meant for the end-user.
+     * This is a helper method that returns every line from cache as string.
      *
-     * @return the concatenated string from the cache
+     * @return the concatenated string of entire cache
      */
     private static String readFromCache() {
+        return readFromCache(null);
+    }
+
+    /**
+     * This method utilizes a StringBuilder to concatenate all the strings in
+     * the cache that contains the key in the given display format meant for the
+     * end-user.
+     *
+     * @param key the keyword to match for
+     * @return the concatenated string from the matched strings in cache
+     */
+    private static String readFromCache(String key) {
         StringBuilder sBuilder = new StringBuilder();
+        int builderIndex = 0;
 
-        for (int i = 1; i <= fileCache.size(); i++) {
-            // array id is one less than cache id
-            int arrayId = i - 1;
-
-            sBuilder.append(String.format(MESSAGE_DISPLAY_ITEM, i,
-                    fileCache.get(arrayId)));
-            sBuilder.append(System.lineSeparator());
+        for (int i = 0; i < fileCache.size(); i++) {
+            String line = fileCache.get(i);
+            if (key == null || line.contains(key)) {
+                sBuilder.append(String.format(MESSAGE_DISPLAY_ITEM,
+                        ++builderIndex, line));
+                sBuilder.append(System.lineSeparator());
+            }
         }
 
         removeNewLine(sBuilder);
@@ -306,15 +366,14 @@ public class TextBuddy {
     }
 
     /**
-     * This method is used to initialize the file as well as performing
-     * a fetch from the file to the direct cache of the program.
+     * This method is used to initialize the file as well as performing a fetch
+     * from the file to the direct cache of the program.
      *
-     * @param filePath the specified file path provided by user
+     * @param filePath specified file path provided by user
      */
-    private static void initFile(String filePath) {
+    protected static void initFile(String filePath) {
         fileRef = new File(filePath);
 
-        // if file does not exist, create a new file
         if (!fileRef.exists()) {
             try {
                 fileRef.createNewFile();
@@ -326,13 +385,12 @@ public class TextBuddy {
             readFromFile();
         }
 
-        // save the filename as a class variable for wider scope
         fileName = fileRef.getName();
     }
 
     /**
-     * This method is used to check whether user specifies an argument
-     * if no argument is found, show feedback and exit the program.
+     * This method is used to check whether user specifies an argument if no
+     * argument is found, show feedback and exit the program.
      *
      * @param args arguments provided in command line interface
      */
@@ -344,15 +402,15 @@ public class TextBuddy {
     }
 
     /**
-     * This method is used to check the cache Id and it is invalid
-     * if it is not an integer, or exceed the boundary of the cache.
+     * This method is used to check the cache Id and it is invalid if it is not
+     * an integer, or exceed the boundary of the cache.
      *
      * @param cacheId the cache id specified by the user
      * @return true if valid else false
      */
     private static boolean checkValidId(int cacheId) {
-        return !(cacheId == INVALID_INTEGER || cacheId <= 0
-                || cacheId > fileCache.size());
+        return !(cacheId == INVALID_INTEGER || cacheId <= 0 || cacheId > fileCache
+                .size());
     }
 
     private static void showToUser(String message) {
@@ -360,8 +418,8 @@ public class TextBuddy {
     }
 
     /**
-     * This method is used to determine what is the command
-     * to be performed by the user.
+     * This method is used to determine what is the command to be performed by
+     * the user.
      *
      * @param userInput user's raw input
      * @return the command type based on user's input
@@ -371,12 +429,16 @@ public class TextBuddy {
 
         if (command.equalsIgnoreCase("add")) {
             return CommandType.ADD_STRING;
-        } else if (command.equalsIgnoreCase("delete")) {
-            return CommandType.DELETE;
-        } else if (command.equalsIgnoreCase("clear")) {
-            return CommandType.CLEAR;
         } else if (command.equalsIgnoreCase("display")) {
             return CommandType.DISPLAY;
+        } else if (command.equalsIgnoreCase("delete")) {
+            return CommandType.DELETE;
+        } else if (command.equalsIgnoreCase("sort")) {
+            return CommandType.SORT;
+        } else if (command.equalsIgnoreCase("search")) {
+            return CommandType.SEARCH;
+        } else if (command.equalsIgnoreCase("clear")) {
+            return CommandType.CLEAR;
         } else if (command.equalsIgnoreCase("exit")) {
             return CommandType.EXIT;
         } else {
