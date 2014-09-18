@@ -36,7 +36,6 @@ import java.util.Scanner;
 *
 */
 public class TextBuddy {
-
     /** These are system messages and can be formatted for uniformity. */
     private static final String MESSAGE_WELCOME_STRING = "welcome to TextBuddy. %1$s is ready for use";
     private static final String MESSAGE_INPUT_INVALID = "invalid Command: %1$s";
@@ -51,8 +50,8 @@ public class TextBuddy {
     private static final String MESSAGE_SORT_EMPTY = "nothing to sort";
     private static final String MESSAGE_SEARCH_EMPTY = "please enter something to search";
     private static final String MESSAGE_SEARCH_FAIL = "no line containing '%1$s' is found";
-    private static final String FILEPATH_INVALID_STRING = "you entered an invalid filename / filepath";
-    private static final String FILEPATH_MISSING_STRING = "please enter the path to the textfile to start";
+    private static final String SYSTEM_FILEPATH_INVALID = "you entered an invalid filename / filepath";
+    private static final String SYSTEM_FILEPATH_MISSING = "please enter the path to the textfile to start";
     private static final String SYSTEM_UNKNOWN_COMMAND = "system has encountered an unknown command type";
     private static final String SYSTEM_IO_ERROR = "it seems that we encountered an IO Exception";
 
@@ -61,7 +60,7 @@ public class TextBuddy {
     private static File fileRef;
     private static final int FILE_INDEX = 0;
 
-    /** This scanner object is declared as cvar due to its wide scope. */
+    /** This scanner object is declared as global due to its wide usage. */
     private static Scanner scanner = new Scanner(System.in);
 
     /** This list is used as a direct cache between the file and application. */
@@ -207,8 +206,8 @@ public class TextBuddy {
     }
 
     /**
-     * This method is used to sort cache in alphabetical order and write to file.
-     * If cache is empty, return error message.
+     * This method is used to sort cache in alphabetical order and write to
+     * file. If cache is empty, return error message.
      *
      * @return feedback on sort operation
      */
@@ -224,8 +223,9 @@ public class TextBuddy {
     }
 
     /**
-     * This method is used to search and returns lines that contains the argument
-     * If no keyword is passed or no results found, return error message.
+     * This method is used to search and returns lines that contains the
+     * argument If no keyword is passed or no results found, return error
+     * message.
      *
      * @param argument the keyword to search for
      * @return single String that contains all line containing keyword
@@ -273,7 +273,7 @@ public class TextBuddy {
                 line = bReader.readLine();
             }
         } catch (FileNotFoundException e) {
-            throw new Error(FILEPATH_INVALID_STRING);
+            throw new Error(SYSTEM_FILEPATH_INVALID);
         } catch (IOException e) {
             throw new Error(SYSTEM_IO_ERROR);
         } finally {
@@ -289,7 +289,7 @@ public class TextBuddy {
      * This method is used to write either from the cache to the file or appends
      * a specified argument to the end of the file via BufferedWriter.
      *
-     * @param isAppend  determines a append or write operation to the file
+     * @param isAppend determines a append or write operation to the file
      * @param newString if isAppend, this string will be appended to file
      */
     private static void writeToFile(boolean isAppend, String newString) {
@@ -378,7 +378,7 @@ public class TextBuddy {
             try {
                 fileRef.createNewFile();
             } catch (IOException e) {
-                showToUser(FILEPATH_INVALID_STRING);
+                showToUser(SYSTEM_FILEPATH_INVALID);
                 System.exit(0);
             }
         } else {
@@ -396,7 +396,7 @@ public class TextBuddy {
      */
     private static void checkFirstArgument(String[] args) {
         if (args.length == 0) {
-            showToUser(FILEPATH_MISSING_STRING);
+            showToUser(SYSTEM_FILEPATH_MISSING);
             System.exit(0);
         }
     }
@@ -463,8 +463,7 @@ public class TextBuddy {
     }
 
     private static String getFirstWord(String userInput) {
-        String commandTypeString = userInput.trim().split("\\s+")[0];
-        return commandTypeString;
+        return userInput.trim().split("\\s+")[0];
     }
 
     private static String returnInvalidMessage(String userInput) {

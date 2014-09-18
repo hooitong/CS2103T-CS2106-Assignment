@@ -109,25 +109,19 @@ public class TextBuddyTest {
 
         assertEquals("Test whether searching works", "1. i am groot",
                 TextBuddy.executeCommand("search groot"));
-
         assertEquals("Test whether searching works", "1. i is scrub",
                 TextBuddy.executeCommand("search scrub"));
-
         assertEquals("Test whether searching works",
                 "1. i am groot\n2. i am tom\n3. i am jack",
                 TextBuddy.executeCommand("search am"));
-
         assertEquals("Test whether searching works",
                 "1. i am groot\n2. i am tom\n3. i am jack\n4. i is scrub",
                 TextBuddy.executeCommand("search i"));
-
         assertEquals("Test proper message returned when no results",
                 "no line containing 'you' is found",
                 TextBuddy.executeCommand("search you"));
-
         assertEquals("Return error message when no keyword entered",
                 "please enter something to search",
                 TextBuddy.executeCommand("search"));
     }
-
 }

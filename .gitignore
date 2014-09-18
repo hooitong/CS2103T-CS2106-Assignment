@@ -24,6 +24,7 @@ hs_err_pid*
 *.in
 *.my
 *.out
+*.ht
 TextBuddy/.settings/de.loskutov.anyedit.AnyEditTools.prefs
 
 TextBuddy/.settings/org.eclipse.jdt.core.prefs
