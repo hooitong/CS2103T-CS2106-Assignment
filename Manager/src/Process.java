@@ -1,4 +1,5 @@
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 /**
@@ -33,7 +34,7 @@ public class Process {
      */
     private String pid;
     private int priority;
-    private HashMap<Resource, Integer> other_resources;
+    private LinkedHashMap<Resource, Integer> other_resources;
     private int status_type;
     private LinkedList<Process> status_list;
     private Process parent;
@@ -52,7 +53,7 @@ public class Process {
     public Process(String pid, int priority) {
         this.pid = pid;
         this.priority = priority;
-        this.other_resources = new HashMap<Resource, Integer>();
+        this.other_resources = new LinkedHashMap<Resource, Integer>();
         this.status_type = Process.READY;
         this.status_list = null;
         this.parent = null;
@@ -70,7 +71,7 @@ public class Process {
         return priority;
     }
 
-    public HashMap<Resource, Integer> getResources() {
+    public LinkedHashMap<Resource, Integer> getResources() {
         return other_resources;
     }
 

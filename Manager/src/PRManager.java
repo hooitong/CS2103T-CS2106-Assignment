@@ -290,14 +290,14 @@ public class PRManager {
      */
     private static boolean releaseResources(Resource resource, int unit, Process p,
         boolean isRemove) {
-        /* If resource to be released is not held by process p, show error */
-        if (!p.getResources().containsKey(resource)) {
+        /* If request process is init, deny and return */
+        if (p.getPid().equalsIgnoreCase("init")) {
             showError();
             return false;
         }
 
-        /* If request process is init, deny and return */
-        if (p.getPid().equalsIgnoreCase("init")) {
+        /* If resource to be released is not held by process p, show error */
+        if (!p.getResources().containsKey(resource)) {
             showError();
             return false;
         }
@@ -318,9 +318,8 @@ public class PRManager {
                 return true;
             } else {
                 showError();
+                return false;
             }
-
-            return false;
         }
 
         /* Update the number of free units the resource have */
@@ -377,6 +376,12 @@ public class PRManager {
      * @param p        the process making the request
      */
     private static void requestResources(Resource resource, int unit, Process p) {
+        /* If request process is init, deny and return */
+        if (p.getPid().equalsIgnoreCase("init")) {
+            showError();
+            return;
+        }
+
         /* If the requested unit is not valid, show error and return */
         if (unit > resource.getMaxUnits() || unit <= 0) {
             /* If unit == 0, just allocate no resource & run scheduler */
@@ -386,12 +391,6 @@ public class PRManager {
                 showError();
             }
 
-            return;
-        }
-
-        /* If request process is init, deny and return */
-        if (p.getPid().equalsIgnoreCase("init")) {
-            showError();
             return;
         }
 
@@ -445,6 +444,30 @@ public class PRManager {
 
         /* Call scheduler at the end of every kernel call */
         scheduler();
+    }
+
+    public static void printAllProcess() {
+        for (Process p : processes) {
+            printProcess(p.getPid());
+        }
+    }
+
+    public static void printAllResource() {
+        for (Resource r : resources) {
+            printResource(r.getRid());
+        }
+    }
+
+    public static void printProcess(String argument) {
+        Process p = getProcess(argument);
+        System.out.println(p.getPid() + " " + p.getPriority() + " " + p.getType());
+    }
+
+    public static void printResource(String argument) {
+        Resource r = getResource(argument);
+        System.out.println(
+            r.getRid() + " " + r.getFreeUnits() + "/" + r.getMaxUnits() + " " + r
+                .getBlockList().size());
     }
 
     /* Helper Methods - Self Explanatory */

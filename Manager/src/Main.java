@@ -12,7 +12,7 @@ public class Main {
      * List of possible commands executed by user
      */
     private enum CommandType {
-        INIT, CREATE, DELETE, REQUEST, RELEASE, TIME_OUT, INVALID
+        INIT, CREATE, DELETE, REQUEST, RELEASE, TIME_OUT, ALL_PROCESS, ALL_RESOURCE, GET_PROCESS, GET_RESOURCE, INVALID
     }
 
 
@@ -47,7 +47,8 @@ public class Main {
         /* Based on user's command, call correct method in PRManager */
         switch (commandType) {
             case INIT:
-                System.out.print("\n\n"); /* create new line for new test sequence */
+                 /* create new line for new test sequence */
+                System.out.print("\r\n\r\n");
                 PRManager.init();
                 break;
 
@@ -85,6 +86,22 @@ public class Main {
 
             case TIME_OUT:
                 PRManager.timeOut();
+                break;
+
+            case ALL_PROCESS:
+                PRManager.printAllProcess();
+                break;
+
+            case ALL_RESOURCE:
+                PRManager.printAllResource();
+                break;
+
+            case GET_PROCESS:
+                PRManager.printProcess(arguments[0]);
+                break;
+
+            case GET_RESOURCE:
+                PRManager.printResource(arguments[0]);
                 break;
 
             case INVALID:
@@ -126,6 +143,14 @@ public class Main {
             return CommandType.RELEASE;
         } else if (command.equalsIgnoreCase("to")) {
             return CommandType.TIME_OUT;
+        } else if (command.equalsIgnoreCase("allp")) {
+            return CommandType.ALL_PROCESS;
+        } else if (command.equalsIgnoreCase("allr")) {
+            return CommandType.ALL_RESOURCE;
+        } else if (command.equalsIgnoreCase("getp")) {
+            return CommandType.GET_PROCESS;
+        } else if (command.equalsIgnoreCase("getr")) {
+            return CommandType.GET_RESOURCE;
         } else {
             return CommandType.INVALID;
         }
@@ -134,12 +159,16 @@ public class Main {
     /* Helper Methods - Self Explanatory */
 
     private static String getFirstWord(String userInput) {
-        String commandTypeString = userInput.trim().split("\\s+")[0];
-        return commandTypeString;
+        return userInput.trim().split("\\s+")[0];
     }
 
     private static String removeFirstWord(String userInput) {
-        return userInput.replace(getFirstWord(userInput), "").trim();
+        String[] split = userInput.split("\\s+", 2);
+        if (split.length == 1) {
+            return "";
+        } else {
+            return split[1];
+        }
     }
 
     private static String[] splitArguments(String userInput) {
