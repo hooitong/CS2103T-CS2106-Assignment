@@ -160,6 +160,7 @@ public class PRManager {
 
         /* Remove all resource pointers in the process */
         pResources.clear();
+        p.getResources().clear();
 
         /* Remove from Blocked List or Ready List */
         removeFromList(p);
@@ -286,6 +287,7 @@ public class PRManager {
      * @param resource the pointer of requested resource
      * @param unit     the number of requested units to release
      * @param p        the process making the release
+     * @param isRemove it is false if it is part of a destroy operation
      * @return whether release operation is successful
      */
     private static boolean releaseResources(Resource resource, int unit, Process p,
@@ -335,7 +337,12 @@ public class PRManager {
             resource.setFreeUnits(resource.getFreeUnits() - successP.getBlockedReqUnit());
 
             /* Add resource pointer to the resource list in Process p */
-            successP.getResources().put(resource, successP.getBlockedReqUnit());
+            if (successP.getResources().containsKey(resource)) {
+                successP.getResources().put(resource,
+                    successP.getResources().get(resource) + successP.getBlockedReqUnit());
+            } else {
+                successP.getResources().put(resource, successP.getBlockedReqUnit());
+            }
 
             /* Remove from Blocked List */
             removeFromBL(successP);
@@ -446,25 +453,58 @@ public class PRManager {
         scheduler();
     }
 
+    /**
+     * Print all processes and some of its information in the manager.
+     */
     public static void printAllProcess() {
+        /* if no processes, return */
+        if (processes.isEmpty()) {
+            return;
+        }
+
         for (Process p : processes) {
             printProcess(p.getPid());
         }
     }
 
+    /**
+     * Print all resources and some of its information in the manager.
+     */
     public static void printAllResource() {
         for (Resource r : resources) {
             printResource(r.getRid());
         }
     }
 
+    /**
+     * Print a single process and its relevant information
+     *
+     * @param argument pid of the argument
+     */
     public static void printProcess(String argument) {
         Process p = getProcess(argument);
+
+        /* if no process exist, return */
+        if (p == null) {
+            return;
+        }
+
         System.out.println(p.getPid() + " " + p.getPriority() + " " + p.getType());
     }
 
+    /**
+     * Print a single resource and its relevant information
+     *
+     * @param argument rid of the resource
+     */
     public static void printResource(String argument) {
         Resource r = getResource(argument);
+
+        /* if no resource exist, return */
+        if (r == null) {
+            return;
+        }
+
         System.out.println(
             r.getRid() + " " + r.getFreeUnits() + "/" + r.getMaxUnits() + " " + r
                 .getBlockList().size());
@@ -487,6 +527,7 @@ public class PRManager {
     private static void addToRL(Process p) {
         readyList[p.getPriority()].add(p);
         p.setList(readyList[p.getPriority()]);
+        p.setType(Process.READY);
     }
 
     private static void removeFromRL(Process p) {
@@ -498,6 +539,7 @@ public class PRManager {
         r.getBlockList().add(p);
         p.setBlockedReqUnit(unit);
         p.setList(r.getBlockList());
+        p.setType(Process.BLOCKED);
     }
 
     private static void removeFromBL(Process p) {
@@ -507,10 +549,9 @@ public class PRManager {
     }
 
     private static void modifyTree(Process parent, Process child) {
-        if (parent != null) {
+        if (parent != null && child != null) {
             parent.addChild(child);
             child.setParent(parent);
         }
     }
-
 }

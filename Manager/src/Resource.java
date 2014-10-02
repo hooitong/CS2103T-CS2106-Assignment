@@ -8,6 +8,9 @@ import java.util.LinkedList;
 
 public class Resource {
 
+    /**
+     * Required Data Structure for RCB
+     */
     private String rid;
     private int maxUnits;
     private int freeUnits;

@@ -44,7 +44,7 @@ public class Main {
         CommandType commandType = getCommandType(userInput);
         String[] arguments = splitArguments(removeFirstWord(userInput));
 
-        /* Based on user's command, call correct method in PRManager */
+        /* Based on user's command, execute correct method in PRManager */
         switch (commandType) {
             case INIT:
                  /* create new line for new test sequence */
@@ -97,11 +97,19 @@ public class Main {
                 break;
 
             case GET_PROCESS:
-                PRManager.printProcess(arguments[0]);
+                if (arguments.length != 1) {
+                    showError();
+                } else {
+                    PRManager.printProcess(arguments[0]);
+                }
                 break;
 
             case GET_RESOURCE:
-                PRManager.printResource(arguments[0]);
+                if (arguments.length != 1) {
+                    showError();
+                } else {
+                    PRManager.printResource(arguments[0]);
+                }
                 break;
 
             case INVALID:
@@ -163,7 +171,7 @@ public class Main {
     }
 
     private static String removeFirstWord(String userInput) {
-        String[] split = userInput.split("\\s+", 2);
+        String[] split = userInput.trim().split("\\s+", 2);
         if (split.length == 1) {
             return "";
         } else {
